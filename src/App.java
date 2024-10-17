@@ -3,7 +3,7 @@ import java.util.List;
 
 public class App {
     public static void main(String[] args) throws Exception {
-        int size = 20;
+        int size;
         List<String> words = new ArrayList<>();
 
         words.add("CAMEL");
@@ -14,6 +14,8 @@ public class App {
         words.add("LION");
         words.add("NATHAN");
         words.add("SWEENEY");
+
+        size = Helper.CalculateSize(words);
 
         Board board = new Board(size, 50);
         board.placeWords(words);

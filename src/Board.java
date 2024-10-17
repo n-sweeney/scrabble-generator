@@ -5,8 +5,8 @@ import java.util.List;
 public class Board {
     private int gridSize;
     private char[][] grid;
-    private List<String> placedWords = new ArrayList<>();
-    private int retryCount;
+    private final List<String> placedWords = new ArrayList<>();
+    private final int retryCount;
 
     public Board(int initialSize, int retryCount) {
         this.gridSize = initialSize;
@@ -52,6 +52,7 @@ public class Board {
     void placeWords(List<String> words) {
         boolean complete = false;
         int retries = 0;
+        int previousSize = Integer.MAX_VALUE;
         while (!complete && retries < retryCount) {
 
             Collections.shuffle(words);
@@ -86,8 +87,16 @@ public class Board {
 
                 if (!placed) {
                     if (words.size() > 1) {
+                        if (previousSize == words.size()) {
+                            retries++;
+                            System.err.println("TOO SMALL NO PROGRESS");
+                            break;
+
+                        }
+
                         words.remove(0);
                         words.add(currentWord);
+                        previousSize = words.size();
                     } else {
                         retries++;
                         break;
@@ -123,8 +132,9 @@ public class Board {
         for (int index : indexes) {
             boolean found = true;
             for (int ii = 0; ii < word.length(); ii++) {
-                if (i + ii - index < 0 || i + ii - index > gridSize) {
-                    continue;
+                if (i + ii - index <= 0 || i + ii - index >= gridSize) {
+                    found = false;
+                    break;
                 }
                 char currentCell = grid[i + ii - index][j];
                 if (currentCell != ' ' && currentCell != word.charAt(ii)) {
@@ -158,7 +168,7 @@ public class Board {
         for (int index : indexes) {
             boolean found = true;
             for (int ii = 0; ii < word.length(); ii++) {
-                if (j + ii - index < 0 || j + ii - index >= gridSize) {
+                if (j + ii - index <= 0 || j + ii - index >= gridSize) {
                     found = false;
                     break;
                 }
@@ -241,7 +251,9 @@ public class Board {
         }
 
         placedWords.add(word);
-        // printBoard();
+    }
+
+    void resizeGrid() {
 
     }
 }
