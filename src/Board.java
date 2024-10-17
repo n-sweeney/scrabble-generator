@@ -1,14 +1,17 @@
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Board {
     private int gridSize;
     private char[][] grid;
     private List<String> placedWords = new ArrayList<>();
+    private int retryCount;
 
-    public Board(int initialSize) {
+    public Board(int initialSize, int retryCount) {
         this.gridSize = initialSize;
         this.grid = new char[gridSize][gridSize];
+        this.retryCount = retryCount;
         initialiseBoard();
     }
 
@@ -47,44 +50,51 @@ public class Board {
     }
 
     void placeWords(List<String> words) {
-        resetBoard(words.get(0));
-        words.remove(0);
-        while (!words.isEmpty()) {
+        boolean complete = false;
+        int retries = 0;
+        while (!complete && retries < retryCount) {
 
-            boolean placed = false;
-            String currentWord = words.get(0);
-            for (int i = 0; i < gridSize; i++) {
-                for (int j = 0; j < gridSize; j++) {
-                    char letter = grid[i][j];
-                    if (letter == ' ') {
-                        continue;
-                    }
-                    // If match
-                    if (currentWord.contains(String.valueOf(letter))) {
-                        // Find Potential
-                        if (checkValid(i, j, currentWord)) {
-                            // Placed so break and go to next word
-                            placed = true;
-                            words.remove(0);
-                            break;
+            Collections.shuffle(words);
+            resetBoard(words.get(0));
+            words.remove(0);
+            while (!words.isEmpty()) {
+
+                boolean placed = false;
+                String currentWord = words.get(0);
+                for (int i = 0; i < gridSize; i++) {
+                    for (int j = 0; j < gridSize; j++) {
+                        char letter = grid[i][j];
+                        if (letter == ' ') {
+                            continue;
                         }
+                        // If match
+                        if (currentWord.contains(String.valueOf(letter))) {
+                            // Find Potential
+                            if (checkValid(i, j, currentWord)) {
+                                // Placed so break and go to next word
+                                placed = true;
+                                words.remove(0);
+                                break;
+                            }
+                        }
+
                     }
-
+                    if (placed) {
+                        break;
+                    }
                 }
-                if (placed) {
-                    break;
+
+                if (!placed) {
+                    if (words.size() > 1) {
+                        words.remove(0);
+                        words.add(currentWord);
+                    } else {
+                        retries++;
+                        break;
+                    }
                 }
             }
-
-            if (!placed) {
-                if (words.size() > 1) {
-                    words.remove(0);
-                    words.add(currentWord);
-                } else {
-                    // Cant place error
-                    break;
-                }
-            }
+            complete = true;
         }
 
     }
@@ -113,7 +123,7 @@ public class Board {
         for (int index : indexes) {
             boolean found = true;
             for (int ii = 0; ii < word.length(); ii++) {
-                if (i + ii - index < 0) {
+                if (i + ii - index < 0 || i + ii - index > gridSize) {
                     continue;
                 }
                 char currentCell = grid[i + ii - index][j];
@@ -130,6 +140,11 @@ public class Board {
                 }
             }
             if (found) {
+                if (!(i - index <= 0 || i - index + word.length() >= gridSize)) {
+                    if (grid[i - index - 1][j] != ' ' || grid[i - index + word.length()][j] != ' ') {
+                        break;
+                    }
+                }
                 return index;
             }
         }
@@ -143,8 +158,9 @@ public class Board {
         for (int index : indexes) {
             boolean found = true;
             for (int ii = 0; ii < word.length(); ii++) {
-                if (j + ii - index < 0) {
-                    continue;
+                if (j + ii - index < 0 || j + ii - index >= gridSize) {
+                    found = false;
+                    break;
                 }
 
                 char currentCell = grid[i][j + ii - index];
@@ -161,6 +177,13 @@ public class Board {
                 }
             }
             if (found) {
+                // Check if string is valid
+                if (!(j - index <= 0 || j - index + word.length() >= gridSize)) {
+                    if (grid[i][j - index - 1] != ' ' || grid[i][j - index + word.length()] != ' ') {
+                        break;
+                    }
+                }
+
                 return index;
             }
 
@@ -218,8 +241,7 @@ public class Board {
         }
 
         placedWords.add(word);
-        printBoard();
+        // printBoard();
 
     }
-
 }

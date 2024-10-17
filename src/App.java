@@ -15,7 +15,7 @@ public class App {
         words.add("NATHAN");
         words.add("SWEENEY");
 
-        Board board = new Board(size);
+        Board board = new Board(size, 50);
         board.placeWords(words);
         board.printBoard();
     }
