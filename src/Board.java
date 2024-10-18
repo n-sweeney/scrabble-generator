@@ -89,7 +89,7 @@ public class Board {
                     if (words.size() > 1) {
                         if (previousSize == words.size()) {
                             retries++;
-                            System.err.println("TOO SMALL NO PROGRESS");
+                            resizeGrid();
                             break;
 
                         }
@@ -103,6 +103,7 @@ public class Board {
                     }
                 }
             }
+            trimGrid();
             complete = true;
         }
 
@@ -254,6 +255,68 @@ public class Board {
     }
 
     void resizeGrid() {
+        int newGridSize = gridSize * 2;
+        int padding = gridSize / 2;
+
+        char[][] newGrid = new char[newGridSize][newGridSize];
+
+        for (int i = 0; i < gridSize; i++) {
+            for (int j = 0; j < gridSize; j++) {
+                newGrid[padding + i][padding + j] = grid[i][j];
+            }
+        }
+
+        grid = newGrid;
+        gridSize = newGridSize;
+    }
+
+    private void trimGrid() {
+        int minX = gridSize;
+        int maxX = -1;
+        int minY = gridSize;
+        int maxY = -1;
+
+        for (int x = 0; x < gridSize; x++) {
+            for (int y = 0; y < gridSize; y++) {
+                if (grid[x][y] != ' ') {
+                    if (x < minX)
+                        minX = x;
+                    if (x > maxX)
+                        maxX = x;
+                    if (y < minY)
+                        minY = y;
+                    if (y > maxY)
+                        maxY = y;
+                }
+            }
+        }
+
+        int trimmedWidth = maxY - minY + 1;
+        int trimmedHeight = maxX - minX + 1;
+
+        int squareSize = Math.max(trimmedWidth, trimmedHeight);
+        char[][] trimmedGrid = new char[squareSize][squareSize];
+
+        for (int i = 0; i < squareSize; i++) {
+            for (int j = 0; j < squareSize; j++) {
+                trimmedGrid[i][j] = ' ';
+            }
+        }
+
+        int offsetI = (squareSize - trimmedHeight) / 2;
+        int offsetJ = (squareSize - trimmedWidth) / 2;
+
+        for (int i = 0; i < trimmedHeight; i++) {
+            for (int j = 0; j < trimmedWidth; j++) {
+                trimmedGrid[offsetI + i][offsetJ + j] = grid[minX + i][minY + j];
+            }
+        }
+
+        grid = trimmedGrid;
+        gridSize = squareSize;
+    }
+
+    void export() {
 
     }
 }
