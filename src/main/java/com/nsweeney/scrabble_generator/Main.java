@@ -15,5 +15,6 @@ public class Main {
         Board board = new Board(size, 50);
         board.placeWords(words);
         board.printBoard();
+        board.export();
     }
 }

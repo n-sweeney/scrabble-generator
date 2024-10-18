@@ -1,8 +1,13 @@
 package com.nsweeney.scrabble_generator;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import javax.imageio.ImageIO;
 
 public class Board {
     private int gridSize;
@@ -326,6 +331,33 @@ public class Board {
     }
 
     void export() {
+        try {
+            BufferedImage firstImage = ImageIO.read(Main.class.getResource("/letters/A.png"));
+            int imageWidth = firstImage.getWidth();
 
+            BufferedImage finalImage = new BufferedImage(gridSize
+                    * imageWidth,
+                    gridSize * imageWidth,
+                    BufferedImage.TYPE_INT_ARGB);
+
+            for (int i = 0; i < gridSize; i++) {
+                for (int j = 0; j < gridSize; j++) {
+                    char currentLetter = grid[i][j];
+
+                    if (currentLetter != ' ') {
+                        String imageName = grid[i][j] + ".png";
+                        BufferedImage img = ImageIO.read(Main.class.getResource("/letters/" + imageName));
+                        finalImage.getGraphics().drawImage(img, i * imageWidth, j * imageWidth, null);
+                    }
+                }
+            }
+
+            ImageIO.write(Helper.CropImage(finalImage), "png", new File("testImage.png"));
+            System.out.println("image successful");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
+
 }
