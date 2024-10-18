@@ -1,3 +1,5 @@
+package com.nsweeney.scrabble_generator;
+
 import java.util.List;
 
 public class Order {
