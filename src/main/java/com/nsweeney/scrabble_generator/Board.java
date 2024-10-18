@@ -51,15 +51,18 @@ public class Board {
         }
     }
 
-    void placeWords(List<String> words) {
+    void placeWords(List<String> inputWords) {
         boolean complete = false;
         int retries = 0;
         int previousSize = Integer.MAX_VALUE;
         while (!complete && retries < retryCount) {
 
+            List<String> words = new ArrayList<>(inputWords);
             Collections.shuffle(words);
+
             resetBoard(words.get(0));
             words.remove(0);
+
             while (!words.isEmpty()) {
 
                 boolean placed = false;
@@ -105,8 +108,12 @@ public class Board {
                     }
                 }
             }
-            trimGrid();
-            complete = true;
+
+            if (words.isEmpty()) {
+                trimGrid();
+                complete = true;
+            }
+
         }
 
     }

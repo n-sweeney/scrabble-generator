@@ -1,5 +1,6 @@
 package com.nsweeney.scrabble_generator;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Order {
@@ -7,5 +8,9 @@ public class Order {
 
     public Order(List<String> words) {
         this.words = words;
+    }
+
+    public Order() {
+        this.words = new ArrayList<String>();
     }
 }
