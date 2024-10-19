@@ -13,12 +13,16 @@ public class Board {
     private int gridSize;
     private char[][] grid;
     private final List<String> placedWords = new ArrayList<>();
+    private List<String> words = new ArrayList<>();
     private final int retryCount;
+    private int score;
 
-    public Board(int initialSize, int retryCount) {
+    public Board(int initialSize, int retryCount, List<String> words) {
         this.gridSize = initialSize;
         this.grid = new char[gridSize][gridSize];
         this.retryCount = retryCount;
+        this.words = words;
+
         initialiseBoard();
     }
 
@@ -117,6 +121,7 @@ public class Board {
             if (words.isEmpty()) {
                 trimGrid();
                 complete = true;
+                calculateScore();
             }
 
         }
@@ -330,7 +335,7 @@ public class Board {
         gridSize = squareSize;
     }
 
-    void export() {
+    void export(String dir) {
         try {
             BufferedImage firstImage = ImageIO.read(Main.class.getResource("/letters/A.png"));
             int imageWidth = firstImage.getWidth();
@@ -352,12 +357,25 @@ public class Board {
                 }
             }
 
-            ImageIO.write(Helper.CropImage(finalImage), "png", new File("testImage.png"));
+            // String orderDir = "Output/" +
+            // Files.createDirectories(Paths.get(dir));
+            ImageIO.write(Helper.CropImage(finalImage), "png", new File(dir + "testImage.png"));
             System.out.println("image successful");
 
         } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
+    void calculateScore() {
+        score = 0;
+        for (String word : words) {
+            for (char letter : word.toCharArray()) {
+                score += Helper.getLetterScore(letter);
+            }
+        }
+    }
+
+    public int getScore() {
+        return score;
+    }
 }

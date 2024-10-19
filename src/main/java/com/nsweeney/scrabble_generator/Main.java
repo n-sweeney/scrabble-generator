@@ -12,9 +12,11 @@ public class Main {
 
         size = Helper.CalculateSize(words);
 
-        Board board = new Board(size, 50);
+        Board board = new Board(size, 50, words);
         board.placeWords(words);
         board.printBoard();
-        board.export();
+        board.export(Helper.GenereateOrderDirectory(testOrder.orderNumber));
+
+        Helper.GeneratePoster(testOrder, board.getScore());
     }
 }
