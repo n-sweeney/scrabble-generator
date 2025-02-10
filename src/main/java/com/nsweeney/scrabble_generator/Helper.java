@@ -18,9 +18,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Helper {
 
-    private Helper() {
-    }
-
+    /**
+     * Static Dictionary of corresponding scrabble scores for each letter
+     */
     private static final Dictionary<Character, Integer> letterScore = new Hashtable<>() {
         {
             put('A', 1);
@@ -49,14 +49,25 @@ public class Helper {
             put('X', 8);
             put('Y', 4);
             put('Z', 10);
-
         }
-    };;
+    };
 
+    public static final String rootTargetDirectory = "Output/";
+    public static final String rootJSONDirectory = "JSON/";
+    /**
+     * Gets the scrabble score for a provided letter
+     * @param l Letter A-Z
+     * @return Scrabble score (0 if invalid)
+     */
     public static int getLetterScore(char l) {
         return letterScore.get(l);
     }
 
+    /**
+     * Calculates the starting dimensions of the grid used for the tiles
+     * @param words List of input words
+     * @return boards length/width
+     */
     public static int CalculateSize(List<String> words) {
 
         int letterTotal = 0;
@@ -67,6 +78,11 @@ public class Helper {
         return (int) Math.ceil(Math.sqrt(letterTotal * 10));
     }
 
+    /**
+     * Loads and parses a given JSON order
+     * @param dir Path directory
+     * @return Parsed order object
+     */
     public static Order ParseOrderJSON(String dir) {
         ObjectMapper mapper = new ObjectMapper();
         Order order;
@@ -80,6 +96,12 @@ public class Helper {
         return order;
     }
 
+
+    /**
+     * Crops the generated image to remove any blank space around the edge. Useful for placement
+     * @param image Loaded image object
+     * @return Subimage with no padding
+     */
     public static BufferedImage CropImage(BufferedImage image) {
         int width = image.getWidth();
         int height = image.getHeight();
@@ -128,8 +150,14 @@ public class Helper {
         return image.getSubimage(left, top, right - left + 1, bottom - top + 1);
     }
 
+    /**
+     * Generates complete poster using order information and generated board.
+     *
+     * @param order order information
+     * @param score board's score
+     */
     public static void GeneratePoster(Order order, int score) {
-        String orderDir = "Output/" + order.orderNumber + "/";
+        String orderDir = "Output/" + order.getOrderID() + "/";
 
         try {
             InputStream is = Main.class.getResourceAsStream("/fonts/Pacifico-Regular.ttf");
@@ -139,7 +167,7 @@ public class Helper {
             int xCentre = overallImage.getWidth() / 2;
             int yCentre = overallImage.getHeight() / 2;
 
-            BufferedImage img = ImageIO.read(new File(orderDir + "testImage.png"));
+            BufferedImage img = ImageIO.read(new File(orderDir + "boardImage.png"));
 
             Graphics2D g = overallImage.createGraphics();
 
@@ -154,7 +182,8 @@ public class Helper {
             g.setFont(customFont);
             g.setColor(Color.BLACK);
 
-            g.drawString(order.topText, xCentre - g.getFontMetrics().stringWidth(order.topText) / 2, 750);
+            String topText = order.getTopText();
+            g.drawString(topText, xCentre - g.getFontMetrics().stringWidth(topText) / 2, 750);
 
             g.setFont(new Font("Arial", Font.BOLD, 120));
             String wordScoreText = "Word Score: " + score;
@@ -164,14 +193,20 @@ public class Helper {
 
             g.dispose();
 
-            ImageIO.write(overallImage, "png", new File(orderDir + "testImageComplete.png"));
-            System.out.println("Image successfully created - overall");
+            ImageIO.write(overallImage, "png", new File(orderDir + "poster.png"));
+            System.out.println("Overall image successfully created");
 
         } catch (FontFormatException | IOException e) {
+            //To Do: Handle
         }
     }
 
-    public static String GenereateOrderDirectory(String order) {
-        return "Output/" + order + "/";
+    /**
+     * Generates the order directory given an order name. Used to provide consistent paths
+     * @param orderID Unique ID of the given order
+     * @return directory path for order
+     */
+    public static String GenerateOrderDirectory(String orderID) {
+        return rootTargetDirectory + orderID + "/";
     }
 }

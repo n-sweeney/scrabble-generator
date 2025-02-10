@@ -1,22 +1,10 @@
 package com.nsweeney.scrabble_generator;
 
-import java.util.List;
-
 public class Main {
     public static void main(String[] args) throws Exception {
-        int size;
 
-        String testDir = "JSON/test.json";
-        Order testOrder = Helper.ParseOrderJSON(testDir);
-        List<String> words = testOrder.words;
+        // The processes are called from a cron job, however, this demonstrates the initial implementation
 
-        size = Helper.CalculateSize(words);
-
-        Board board = new Board(size, 50, words);
-        board.placeWords(words);
-        board.printBoard();
-        board.export(Helper.GenereateOrderDirectory(testOrder.orderNumber));
-
-        Helper.GeneratePoster(testOrder, board.getScore());
+        OrderProcessor orderProcessor = new OrderProcessor();
     }
 }
